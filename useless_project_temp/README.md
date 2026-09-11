@@ -7,8 +7,8 @@
 ## Basic Details
 ### Team Name: Garfields
 ### Team Members
-- Member 2: Adithyan M S
-- Member 3: Alan C Francis
+- Member 1: Adithyan M S
+- Member 2: Alen C Francis
 
 ### Project Description
 MANDI is a deliberately useless, chaotic AI voice companion. Instead of acting like a polite corporate chatbot, MANDI acts like that one sarcastic Indian friend who naturally mixes Hindi, Malayalam, and English ("Hinglish" + "Manglish"), gives obvious advice as if it's a revolutionary discovery, and charges a fake ₹499 consultation fee.
@@ -60,6 +60,9 @@ Open `http://localhost:5173` in your browser.
 
 ## Project Features & Demo Highlights
 
+![MANDI Dashboard](screenshot.png)
+*MANDI UI Dashboard showing real-time voice orb interaction, live audio energy visualization, Uselessness Meter (92%), and multilingual conversation stream in Hinglish & Manglish.*
+
 1. 🎙️ **Real-Time Voice Interaction**: Tap the glowing microphone button to speak naturally.
 2. 🇮🇳 **Hinglish + Manglish Code-Switching**: Mixes Hindi, Malayalam, and English seamlessly ("Arre bro, tension edukkalle yaar!").
 3. 📊 **Dynamic Uselessness Meter**: Live percentage gauge rating Mandi's response absurdity.
@@ -67,6 +70,67 @@ Open `http://localhost:5173` in your browser.
 5. ❓ **"WHY?" Escalation Button**: Repeatedly ask WHY for exponential levels of fake philosophy.
 6. ❓ **"ARE YOU SURE?" Challenge**: Watch Mandi backtrack with unwarranted confidence.
 7. ❤️ **Relationship Mode**: Sarcastic dating advice ("Choose your favorite trauma").
+
+### Project Demo Video
+🎥 [Watch MANDI Demo Video](https://drive.google.com/file/d/1Ziof67M01xvbMlblWeRlMQmDIbBFETrp/view?usp=sharing)  
+*Demonstrates live voice recording, Malayalam/Hinglish speech recognition, Sarvam AI TTS audio streaming, audio-reactive 3D orb animations, dynamic Uselessness Meter updates, and interactive mode triggers.*
+
+---
+
+## System Architecture & Workflow
+
+```mermaid
+graph TD
+    %% User Interaction Layer
+    subgraph Client ["Frontend (React 18 + Vite)"]
+        UI["Glassmorphic UI (Mandi Orb & Stream)"]
+        Mic["Web Speech API / Mic Input"]
+        AudioCtx["Web Audio API (Audio-Reactive Energy)"]
+        AudioPlayer["StreamAudioPlayer (PCM Playback)"]
+    end
+
+    %% Network / Gateway
+    subgraph Protocol ["Real-Time Communication"]
+        WS["WebSocket Server (ws://localhost:8000/ws/voice)"]
+        HTTP["HTTP API Fallback (/api/chat)"]
+    end
+
+    %% Backend Services Layer
+    subgraph Server ["Backend (FastAPI + Python)"]
+        Router["WebSocket & HTTP Router"]
+        Engine["Mandi System Prompt Engine\n(Hinglish + Manglish Code-Switching)"]
+        MoodMeter["Uselessness Meter & Mood Tracker"]
+    end
+
+    %% External AI Services
+    subgraph External ["AI Cloud APIs"]
+        Gemini["Google Gemini API (gemini-1.5-flash)"]
+        Sarvam["Sarvam AI TTS Engine (Bulbul v3)"]
+        Translate["Google Cloud Translation API"]
+    end
+
+    %% Workflow Connections
+    Mic -->|Voice Audio / Transcript| UI
+    UI -->|Stream JSON / Audio Packets| WS
+    UI -.->|HTTP Fallback| HTTP
+    
+    WS --> Router
+    HTTP --> Router
+    Router --> Engine
+    
+    Engine -->|Context Prompt| Gemini
+    Gemini -->|Chaotic Response Text| Engine
+    
+    Engine --> MoodMeter
+    Engine --> Translate
+    Engine -->|Response Text| Sarvam
+    Sarvam -->|Base64 / Audio Stream| Router
+    
+    Router -->|JSON + Audio Payload| WS
+    WS -->|Audio Chunks| AudioPlayer
+    AudioPlayer -->|Voice Output + Pulse Energy| AudioCtx
+    AudioCtx -->|Visual Pulse & Eye Bounce| UI
+```
 
 ---
 
