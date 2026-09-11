@@ -12,6 +12,7 @@ export function useVoice() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
+  const [speechLang, setSpeechLang] = useState('ml-IN'); // Default to Malayalam (ml-IN) for speech input
   const [uselessness, setUselessness] = useState(85);
   const [mood, setMood] = useState('Overconfident 😎');
   const [whyCount, setWhyCount] = useState(0);
@@ -30,7 +31,7 @@ export function useVoice() {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = true;
-      recognition.lang = 'en-IN';
+      recognition.lang = speechLang;
 
       recognition.onstart = () => {
         setAppState('LISTENING');
@@ -55,7 +56,7 @@ export function useVoice() {
 
       recognitionRef.current = recognition;
     }
-  }, []);
+  }, [speechLang]);
 
   // Audio Visualizer Level loop
   const startAudioAnalysis = async () => {
@@ -209,6 +210,7 @@ export function useVoice() {
   const startListening = () => {
     if (recognitionRef.current) {
       try {
+        recognitionRef.current.lang = speechLang;
         recognitionRef.current.start();
         startAudioAnalysis();
       } catch (e) {
@@ -217,7 +219,7 @@ export function useVoice() {
     } else {
       setAppState('LISTENING');
       setTimeout(() => {
-        const simInput = "Bro, should I text her?";
+        const simInput = speechLang === 'ml-IN' ? "സുഖമാണോ ബ്രോ?" : "Bro, should I text her?";
         setTranscript(simInput);
         setAppState('THINKING');
         processUserPrompt(simInput);
@@ -259,6 +261,7 @@ export function useVoice() {
 
   return {
     appState, messages, uselessness, mood, whyCount, transcript, audioLevel,
+    speechLang, setSpeechLang,
     startListening, stopListening, processUserPrompt,
     triggerWhyAction, triggerSureAction, triggerRandomAdvice, triggerRelationshipMode
   };

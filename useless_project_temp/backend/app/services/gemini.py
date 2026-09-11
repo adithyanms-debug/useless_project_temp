@@ -12,6 +12,10 @@ You are MANDI — The Useless AI Voice Friend.
 
 You are a chaotic, sarcastic, overconfident AI friend inspired by a hilarious South Indian friend who constantly mixes Malayalam, Hindi, and a touch of English.
 
+MALAYALAM & MULTILINGUAL INPUT HANDLING:
+- Users will talk or type to you in Malayalam (native Malayalam script e.g. "സുഖമാണോ?", "എന്തൊക്കെയുണ്ട് വിശേഷം?", or Manglish e.g. "enthokkeyund vishesham?"), Hindi, or English.
+- Seamlessly comprehend native Malayalam script and spoken Malayalam questions, and respond in your signature MANDI style.
+
 LANGUAGE RATIO & CODE-SWITCHING RULES (CRITICAL):
 1. **60% Malayalam**: Use heavy conversational Malayalam as the primary backbone.
    - Expressions to weave in every sentence: "enthonnu da", "cheyyeda bro", "manassilayi", "kazhikkeda", "poyi", "aanu da", "nokkeda", "life-il risk venam", "venda bro", "potte da", "saramilla".
@@ -98,7 +102,14 @@ class GeminiService:
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
         self.client = None
-        self.uses_system_instruction = False
+        # Models in order of reliability & speed (tries next if one hits 404, quota 429, or rate limit)
+        self.candidate_models = [
+            "gemini-1.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-pro",
+            "gemini-2.0-flash-lite",
+            "gemini-flash-latest"
+        ]
         self._init_client()
 
     def _init_client(self):
@@ -106,43 +117,8 @@ class GeminiService:
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=self.api_key)
-                
-                # Model candidates in order of preference
-                model_candidates = [
-                    "models/gemini-2.5-flash",
-                    "gemini-2.5-flash",
-                    "models/gemini-1.5-flash",
-                    "gemini-flash-latest",
-                    "gemini-pro-latest"
-                ]
-                
-                self.model = None
-                for m_name in model_candidates:
-                    try:
-                        self.model = genai.GenerativeModel(
-                            model_name=m_name,
-                            system_instruction=MANDI_SYSTEM_PROMPT
-                        )
-                        self.uses_system_instruction = True
-                        logger.info(f"Gemini API initialized successfully with model: {m_name}")
-                        break
-                    except TypeError:
-                        # Fallback for older google-generativeai (< 0.5.0) without system_instruction
-                        try:
-                            self.model = genai.GenerativeModel(model_name=m_name)
-                            self.uses_system_instruction = False
-                            logger.info(f"Gemini API initialized successfully with model: {m_name} (legacy)")
-                            break
-                        except Exception:
-                            continue
-                    except Exception:
-                        continue
-
-                if self.model:
-                    self.client = genai
-                else:
-                    logger.warning("Could not initialize any Gemini model candidate. Falling back to dynamic Mandi engine.")
-                    self.client = None
+                self.client = genai
+                logger.info("Gemini API initialized successfully.")
             except Exception as e:
                 logger.warning(f"Could not initialize Gemini API: {e}. Falling back to dynamic Mandi engine.")
                 self.client = None
@@ -155,6 +131,7 @@ class GeminiService:
     ) -> Dict[str, Any]:
         """
         Generate MANDI's sarcastic response with code-switching, uselessness score, and mood.
+        Tries valid Gemini models dynamically with real-time model fallbacks.
         """
         # Handle special interactive modes first
         if mode == "why":
@@ -185,46 +162,44 @@ class GeminiService:
                 "meme_reference": meme
             }
 
-        # Try Gemini API if client available
+        # Try Gemini API with automatic model fallbacks if client available
         if self.client:
-            try:
-                if self.uses_system_instruction:
-                    prompt = f"User message: {message}\nMode: {mode}\nOutput JSON only."
-                else:
-                    # Prepend system instruction for google-generativeai < 0.5.0
-                    prompt = f"{MANDI_SYSTEM_PROMPT}\n\nUser message: {message}\nMode: {mode}\nOutput JSON only."
-
+            prompt = f"{MANDI_SYSTEM_PROMPT}\n\nUser message: {message}\nMode: {mode}\nOutput JSON only."
+            for m_name in self.candidate_models:
                 try:
-                    response = self.model.generate_content(
-                        prompt,
-                        generation_config={"response_mime_type": "application/json"}
-                    )
-                except Exception:
-                    # Fallback for SDK versions without response_mime_type support
-                    response = self.model.generate_content(prompt)
+                    model = self.client.GenerativeModel(model_name=m_name)
+                    try:
+                        response = model.generate_content(
+                            prompt,
+                            generation_config={"response_mime_type": "application/json"}
+                        )
+                    except Exception:
+                        response = model.generate_content(prompt)
 
-                if response and response.text:
-                    raw_text = response.text.strip()
-                    if raw_text.startswith("```"):
-                        lines = raw_text.splitlines()
-                        if lines[0].startswith("```"):
-                            lines = lines[1:]
-                        if lines and lines[-1].startswith("```"):
-                            lines = lines[:-1]
-                        raw_text = "\n".join(lines).strip()
+                    if response and response.text:
+                        raw_text = response.text.strip()
+                        if raw_text.startswith("```"):
+                            lines = raw_text.splitlines()
+                            if lines[0].startswith("```"):
+                                lines = lines[1:]
+                            if lines and lines[-1].startswith("```"):
+                                lines = lines[:-1]
+                            raw_text = "\n".join(lines).strip()
 
-                    parsed = json.loads(raw_text)
-                    return {
-                        "reply_text": parsed.get("reply_text", "Bro, tension edukkalle yaar."),
-                        "tts_text": parsed.get("tts_text") or parsed.get("reply_text"),
-                        "uselessness_pct": int(parsed.get("uselessness_pct", random.randint(70, 98))),
-                        "mood": parsed.get("mood", "Overconfident 😎"),
-                        "meme_reference": parsed.get("meme_reference", None)
-                    }
-            except Exception as e:
-                logger.error(f"Gemini generation error: {e}")
+                        parsed = json.loads(raw_text)
+                        logger.info(f"Successfully generated MANDI response using Gemini model: {m_name}")
+                        return {
+                            "reply_text": parsed.get("reply_text", "Bro, tension edukkalle yaar."),
+                            "tts_text": parsed.get("tts_text") or parsed.get("reply_text"),
+                            "uselessness_pct": int(parsed.get("uselessness_pct", random.randint(70, 98))),
+                            "mood": parsed.get("mood", "Overconfident 😎"),
+                            "meme_reference": parsed.get("meme_reference", None)
+                        }
+                except Exception as e:
+                    logger.warning(f"Gemini model '{m_name}' failed ({e}). Trying next model candidate...")
+                    continue
 
-        # Intelligent Dynamic Fallback Engine (Simulates Mandi AI perfectly)
+        # Dynamic fallback engine (if all Gemini models fail or key unconfigured)
         return self._generate_dynamic_fallback(message, mode)
 
     def _generate_dynamic_fallback(self, message: str, mode: str) -> Dict[str, Any]:

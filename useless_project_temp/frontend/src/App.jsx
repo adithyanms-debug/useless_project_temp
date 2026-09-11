@@ -21,6 +21,7 @@ import {
   HelpCircle,
   Gauge,
   Smile,
+  Globe,
   HelpCircle as QuestionIcon
 } from 'lucide-react';
 import { downsampleTo16kHz, StreamAudioPlayer } from './audioUtils';
@@ -40,7 +41,9 @@ const MANDI_MOODS = [
 ];
 
 const QUICK_PROMPTS = [
+  { label: "🌴 സുഖമാണോ ബ്രോ?", prompt: "Mandi, സുഖമാണോ ബ്രോ?", icon: Sparkles, mode: "normal" },
   { label: "💔 Crush is ignoring me", prompt: "Mandi, my crush is taking 6 hours to reply. What should I do?", icon: HeartCrack, mode: "relationship" },
+  { label: "☕ ചായ കുടിച്ചോ?", prompt: "Mandi, നീ ചായ കുടിച്ചോ da?", icon: Coffee, mode: "normal" },
   { label: "🔥 Roast my life choices", prompt: "Mandi, roast my life choices and daily routine.", icon: Flame, mode: "normal" },
   { label: "💡 Useless hackathon idea", prompt: "Mandi, give me an intentionally useless hackathon idea.", icon: Zap, mode: "random" },
   { label: "😴 How to avoid work", prompt: "Mandi, tell me a high-IQ excuse to avoid working today.", icon: Coffee, mode: "normal" }
@@ -72,6 +75,9 @@ export default function App() {
     }
   ]);
   const [inputVal, setInputVal] = useState('');
+
+  // Speech Recognition Language ('ml-IN', 'en-IN', 'hi-IN')
+  const [speechLang, setSpeechLang] = useState('ml-IN');
 
   // Diagnostics & Status
   const [healthStatus, setHealthStatus] = useState(null);
@@ -454,7 +460,7 @@ export default function App() {
           const rec = new SpeechRecognitionClass();
           rec.continuous = true;
           rec.interimResults = true;
-          rec.lang = 'en-IN';
+          rec.lang = speechLang;
           speechTranscriptRef.current = '';
 
           rec.onresult = (e) => {
@@ -913,8 +919,45 @@ export default function App() {
             )}
           </div>
 
+          {/* Language Switcher Bar */}
+          <div className="mt-4 flex items-center justify-center gap-1.5 p-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 text-xs shadow-md">
+            <span className="px-2 text-zinc-400 font-medium flex items-center gap-1 text-[11px]">
+              <Globe className="w-3.5 h-3.5 text-cyan-400" /> Speech:
+            </span>
+            <button
+              onClick={() => setSpeechLang('ml-IN')}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                speechLang === 'ml-IN'
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              🌴 Malayalam (ml-IN)
+            </button>
+            <button
+              onClick={() => setSpeechLang('en-IN')}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                speechLang === 'en-IN'
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              🔤 Manglish
+            </button>
+            <button
+              onClick={() => setSpeechLang('hi-IN')}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                speechLang === 'hi-IN'
+                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              🇮🇳 Hindi
+            </button>
+          </div>
+
           {/* Microphone Action Button */}
-          <div className="mt-5 flex items-center justify-center gap-4">
+          <div className="mt-4 flex items-center justify-center gap-4">
             <button
               onClick={handleInteractionToggle}
               className={`relative group flex items-center justify-center h-16 w-16 rounded-full transition-all duration-300 shadow-xl ${

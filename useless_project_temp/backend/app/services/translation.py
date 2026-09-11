@@ -21,6 +21,13 @@ class TranslationService:
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY or settings.GOOGLE_TRANSLATION_API_KEY
         self.client = None
+        self.candidate_models = [
+            "gemini-1.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-pro",
+            "gemini-2.0-flash-lite",
+            "gemini-flash-latest"
+        ]
         self._init_gemini()
 
     def _init_gemini(self):
@@ -28,45 +35,48 @@ class TranslationService:
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=settings.GEMINI_API_KEY)
-                self.model = genai.GenerativeModel(model_name="gemini-2.5-flash")
                 self.client = genai
-                logger.info("Gemini 2.5 Flash translation engine initialized.")
+                logger.info("Gemini translation engine initialized.")
             except Exception as e:
                 logger.warning(f"Could not initialize Gemini for translation: {e}")
                 self.client = None
 
     async def translate_text(self, text: str, target_lang: str = "ml") -> Dict[str, Any]:
         """
-        Translate text using Gemini 2.5 Flash AI model with fallbacks.
+        Translate text using Gemini AI models with real-time model fallbacks.
         """
         text_clean = text.strip().lower()
 
-        # 1. Try Gemini 2.5 Flash Translation
+        # 1. Try Gemini API Translation with model fallbacks
         if self.client:
-            try:
-                lang_names = {
-                    "ml": "Malayalam",
-                    "hi": "Hindi",
-                    "en": "English",
-                    "ta": "Tamil",
-                    "te": "Telugu"
-                }
-                target_name = lang_names.get(target_lang, target_lang)
-                prompt = (
-                    f"Translate the following text accurately into {target_name}.\n"
-                    f"Text: \"{text}\"\n"
-                    f"Provide ONLY the translated text without extra explanation."
-                )
-                response = self.model.generate_content(prompt)
-                if response and response.text:
-                    translated = response.text.strip()
-                    return {
-                        "original_text": text,
-                        "translated_text": translated,
-                        "target_language": target_lang,
-                        "provider": "Gemini 2.5 Flash Translation API"
-                    }
-            except Exception as e:
+            lang_names = {
+                "ml": "Malayalam",
+                "hi": "Hindi",
+                "en": "English",
+                "ta": "Tamil",
+                "te": "Telugu"
+            }
+            target_name = lang_names.get(target_lang, target_lang)
+            prompt = (
+                f"Translate the following text accurately into {target_name}.\n"
+                f"Text: \"{text}\"\n"
+                f"Provide ONLY the translated text without extra explanation."
+            )
+            for m_name in self.candidate_models:
+                try:
+                    model = self.client.GenerativeModel(model_name=m_name)
+                    response = model.generate_content(prompt)
+                    if response and response.text:
+                        translated = response.text.strip()
+                        return {
+                            "original_text": text,
+                            "translated_text": translated,
+                            "target_language": target_lang,
+                            "provider": f"Gemini ({m_name}) Translation API"
+                        }
+                except Exception as e:
+                    logger.warning(f"Gemini translation failed on model '{m_name}': {e}. Trying next...")
+                    continue
                 logger.error(f"Gemini translation error: {e}")
 
         # 2. Try Google Cloud Translation API if key available
