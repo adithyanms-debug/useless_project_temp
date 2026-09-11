@@ -117,19 +117,18 @@ class GeminiService:
                 try:
                     # Try modern google-generativeai (>= 0.5.0)
                     self.model = genai.GenerativeModel(
-                        model_name="gemini-2.5-flash",
-                        # pyrefly: ignore [unexpected-keyword]
+                        model_name="gemini-1.5-flash",
                         system_instruction=MANDI_SYSTEM_PROMPT
                     )
                     self.uses_system_instruction = True
                 except TypeError:
                     # Fallback for older google-generativeai (< 0.5.0)
                     self.model = genai.GenerativeModel(
-                        model_name="gemini-2.5-flash"
+                        model_name="gemini-1.5-flash"
                     )
                     self.uses_system_instruction = False
                 self.client = genai
-                logger.info("Gemini API initialized successfully.")
+                logger.info("Gemini API initialized successfully with gemini-1.5-flash.")
             except Exception as e:
                 logger.warning(f"Could not initialize Gemini API: {e}. Falling back to dynamic Mandi engine.")
                 self.client = None
@@ -200,11 +199,12 @@ class GeminiService:
         return self._generate_dynamic_fallback(message, mode)
 
     def _generate_dynamic_fallback(self, message: str, mode: str) -> Dict[str, Any]:
-        msg_lower = message.lower()
-        
+        msg_clean = message.strip() if message else "your question"
+        msg_lower = message.lower() if message else ""
+
         if "text" in msg_lower or "crush" in msg_lower or "she" in msg_lower or "he" in msg_lower or "girl" in msg_lower or "boy" in msg_lower or "reply" in msg_lower or mode == "relationship":
             return {
-                "reply_text": "Text cheyyeda bro! Life-il risk venam yaar. But single tick mathram vannal njan responsibility edukilla.",
+                "reply_text": f"Arre bro, asking about '{msg_clean}'? Life-il risk venam yaar! Text cheyyeda, but single tick mathram vannal njan responsibility edukilla.",
                 "uselessness_pct": random.randint(78, 92),
                 "mood": "Overconfident 😎",
                 "meme_reference": "Risk Hai Toh Ishq Hai"
@@ -212,7 +212,7 @@ class GeminiService:
 
         if "exam" in msg_lower or "study" in msg_lower or "fail" in msg_lower or "marks" in msg_lower:
             return {
-                "reply_text": "Exam poyi bro, but life poyilla. Although ninte confidence-inu serious damage pattittund.",
+                "reply_text": f"Regarding '{msg_clean}'... Exam poyi bro, but life poyilla! Relax, tension edukkalle.",
                 "uselessness_pct": random.randint(80, 95),
                 "mood": "Chaotic 🔥",
                 "meme_reference": "Exam Trauma"
@@ -220,7 +220,7 @@ class GeminiService:
 
         if "tired" in msg_lower or "sleep" in msg_lower or "headache" in msg_lower:
             return {
-                "reply_text": "Bro if you are tired, sleep da! Wow, revolutionary discovery aanu! That will be ₹499 consultation fee.",
+                "reply_text": f"Bro you asked '{msg_clean}'. If you're tired, sleep da! Wow, revolutionary discovery aanu! That will be ₹499 consultation fee.",
                 "uselessness_pct": 98,
                 "mood": "Peak Uselessness 🤡",
                 "meme_reference": "Consultation Fee ₹499"
@@ -228,14 +228,25 @@ class GeminiService:
 
         if "eat" in msg_lower or "food" in msg_lower or "hungry" in msg_lower:
             return {
-                "reply_text": "Biryani kazhikkeda bro! Swantham stomach-ine happy aakkan poyillel pinne enthonnu life?",
+                "reply_text": f"Thinking about '{msg_clean}'? Biryani kazhikkeda bro! Swantham stomach-ine happy aakkan poyillel pinne enthonnu life?",
                 "uselessness_pct": 75,
                 "mood": "Hungry 🥭",
                 "meme_reference": "Biryani Solution"
             }
 
-        # Pick random response from fallback bank
-        fallback = random.choice(FALLBACK_RESPONSES)
-        return fallback
+        # Dynamic template inserting user question
+        templates = [
+            f"Arre da, regarding '{msg_clean}' — full confidence ayt parayam, 100% zero logic solution aanu my specialty!",
+            f"You asked: '{msg_clean}'? Bro, simple concept aanu, but njan describe cheyyan poyal brain overload aakum!",
+            f"Enthonnu bro ithu? '{msg_clean}' pathiyokke aalochikkanullatha, tension edukkathe chaye kudi!",
+            f"Bilkul top question da: '{msg_clean}'. Answer enikku aariyilla, but confidence look cheyyu!"
+        ]
+
+        return {
+            "reply_text": random.choice(templates),
+            "uselessness_pct": random.randint(82, 99),
+            "mood": random.choice(["Overconfident 😎", "Peak Uselessness 🤡", "Confused 😵", "Chaotic 🔥"]),
+            "meme_reference": "Dynamic User Response"
+        }
 
 gemini_service = GeminiService()
