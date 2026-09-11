@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "useless_project_temp/frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "useless_project_temp/backend/app/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "useless_project_temp/backend/app/main.py"
+    },
+    {
+      "src": "/health",
+      "dest": "useless_project_temp/backend/app/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "useless_project_temp/frontend/$1"
+    }
+  ]
+}
