@@ -5,11 +5,10 @@
 ---
 
 ## Basic Details
-### Team Name: Useless Genius
+### Team Name: Garfields
 ### Team Members
-- Team Lead: Hackathon Dev - College of Engineering
-- Member 2: AI Voice Specialist
-- Member 3: UI/UX Master
+- Member 2: Adithyan M S
+- Member 3: Alan C Francis
 
 ### Project Description
 MANDI is a deliberately useless, chaotic AI voice companion. Instead of acting like a polite corporate chatbot, MANDI acts like that one sarcastic Indian friend who naturally mixes Hindi, Malayalam, and English ("Hinglish" + "Manglish"), gives obvious advice as if it's a revolutionary discovery, and charges a fake ₹499 consultation fee.
