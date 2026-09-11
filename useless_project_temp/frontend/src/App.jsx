@@ -655,7 +655,7 @@ export default function App() {
   const eyeScaleY = 1.0 + audioEnergy * 0.35;
 
   return (
-    <div className="min-h-screen bg-[#070709] text-zinc-100 flex flex-col justify-between selection:bg-rose-500 selection:text-white relative overflow-hidden font-['Outfit',sans-serif]">
+    <div className="h-screen w-screen bg-[#070709] text-zinc-100 flex flex-col justify-between selection:bg-rose-500 selection:text-white relative overflow-hidden font-['Outfit',sans-serif]">
       
       {/* Background Ambient Stars & Gradient Orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -666,37 +666,38 @@ export default function App() {
         <div className="star-dust" style={{ top: '25%', left: '50%', animationDelay: '3.1s' }} />
 
         {/* Ambient Glow Blurs */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-purple-900/15 rounded-full blur-[120px]" />
-        <div className="absolute bottom-10 right-10 w-[350px] h-[350px] bg-cyan-900/10 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-purple-900/15 rounded-full blur-[130px]" />
+        <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-cyan-900/15 rounded-full blur-[120px]" />
+        <div className="absolute top-3/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-rose-900/10 rounded-full blur-[110px]" />
       </div>
 
       {/* Top Header */}
-      <header className="relative z-10 px-4 sm:px-6 py-3.5 border-b border-zinc-800/50 bg-[#070709]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="relative z-20 px-4 sm:px-6 py-2.5 border-b border-white/[0.08] bg-[#070709]/60 backdrop-blur-xl flex-shrink-0">
+        <div className="max-w-[1720px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-purple-600 via-rose-500 to-cyan-400 p-[1.5px] shadow-lg shadow-purple-500/20">
+            <div className="h-9 w-9 rounded-2xl bg-gradient-to-tr from-purple-600 via-rose-500 to-cyan-400 p-[1.5px] shadow-lg shadow-purple-500/20">
               <div className="w-full h-full bg-[#070709] rounded-2xl flex items-center justify-center">
-                <Flame className="w-5 h-5 text-rose-400 animate-pulse" />
+                <Flame className="w-4 h-4 text-rose-400 animate-pulse" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-rose-300 to-cyan-300">
+                <h1 className="text-lg font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-rose-300 to-cyan-300">
                   MANDI
                 </h1>
-                <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                <span className="text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
                   v2.0
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">Chaotic Hindi-Malayalam AI Friend</p>
+              <p className="text-[11px] text-zinc-400 hidden sm:block">Chaotic Hindi-Malayalam AI Friend</p>
             </div>
           </div>
 
-          {/* Quick Character Badges & Diagnostics */}
+          {/* Quick Character Badges & Status */}
           <div className="flex items-center gap-2 sm:gap-3">
             
-            {/* MANDI MOOD BADGE */}
-            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-800/40 text-xs">
+            {/* Mood Badge */}
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-pill text-xs">
               <Smile className="w-3.5 h-3.5 text-purple-400" />
               <span className="text-zinc-400">Mood:</span>
               <span className="text-purple-300 font-semibold">{currentMood}</span>
@@ -708,14 +709,14 @@ export default function App() {
                 if (!isAudioMuted) cancelAllSpeech();
                 setIsAudioMuted(!isAudioMuted);
               }}
-              className="p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition"
+              className="p-2 rounded-xl glass-pill text-zinc-400 hover:text-zinc-200 transition"
               title={isAudioMuted ? "Unmute Voice" : "Mute Voice"}
             >
               {isAudioMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-cyan-400" />}
             </button>
 
             {/* WebSocket Connection Pill */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl glass-pill text-xs">
               {wsStatus === 'connected' ? (
                 <Wifi className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
               ) : wsStatus === 'reconnecting' ? (
@@ -741,368 +742,425 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="relative z-10 flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col items-center justify-between">
+      {/* Main Full-Screen Layout: Left = Orb, Right = Chat */}
+      <main className="relative z-10 flex-1 w-full max-w-[1720px] mx-auto p-3 sm:p-4 lg:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 min-h-0 overflow-hidden">
         
-        {/* CENTER VISUALIZER & ORB SECTION */}
-        <section className="w-full flex flex-col items-center justify-center my-auto py-2">
-          
-          {/* USELESSNESS METER */}
-          <div className="w-full max-w-sm mb-4 px-4 py-2 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 backdrop-blur-md flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-2">
-              <Gauge className="w-4 h-4 text-rose-400 animate-pulse" />
-              <span className="text-zinc-400 font-mono uppercase tracking-wider text-[10px]">Uselessness:</span>
-              <span className="font-bold text-rose-400 font-mono">{uselessness}%</span>
-            </div>
+        {/* ================= LEFT COLUMN: ORB & VOICE ASSISTANT ================= */}
+        <section className="lg:col-span-5 h-full min-h-0 flex flex-col">
+          <div className="glass-card rounded-3xl p-4 sm:p-6 flex flex-col justify-between items-center h-full relative overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl">
             
-            {/* Visual Meter Bar */}
-            <div className="flex-1 mx-3 h-2 bg-zinc-800 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-purple-500 via-rose-500 to-amber-400 rounded-full transition-all duration-500"
-                style={{ width: `${uselessness}%` }}
-              />
-            </div>
+            {/* Top decorative glow */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-24 bg-purple-600/20 blur-3xl pointer-events-none rounded-full" />
 
-            <div className="text-[11px] font-semibold text-purple-300 truncate max-w-[120px]">
-              {currentMood}
-            </div>
-          </div>
-
-          {/* Microphone Permission / Error Notice */}
-          {micError && (
-            <div className="mb-3 max-w-md px-4 py-2 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{micError}</span>
-            </div>
-          )}
-
-          {/* THE MANDI GLOWING ORB */}
-          <div className="relative my-4 flex items-center justify-center">
-            
-            {/* Outer Cyan Rim Ripple */}
-            <div 
-              className={`absolute w-72 h-72 rounded-full border border-cyan-400/30 transition-all duration-300 pointer-events-none ${
-                orbState === 'LISTENING' || isMicRecording
-                  ? 'scale-125 opacity-80 animate-ping'
-                  : orbState === 'SPEAKING'
-                  ? 'scale-110 opacity-60'
-                  : 'scale-95 opacity-0'
-              }`}
-            />
-            
-            {/* Ambient Backing Halo with dynamic energy glow */}
-            <div 
-              className="absolute w-64 h-64 rounded-full blur-2xl transition-all duration-300 pointer-events-none"
-              style={{
-                backgroundColor: orbState === 'ERROR' ? 'rgba(225, 29, 72, 0.4)' :
-                                 orbState === 'LISTENING' || isMicRecording ? `rgba(6, 182, 212, ${cyanAlpha})` :
-                                 orbState === 'THINKING' ? 'rgba(219, 39, 119, 0.35)' :
-                                 `rgba(147, 51, 234, ${0.3 + audioEnergy * 0.4})`
-              }}
-            />
-
-            {/* Core Spherical Orb with Real-Time Audio Reactive Scale & Dynamic Shadow */}
-            <div 
-              onClick={handleInteractionToggle}
-              className={`mandi-orb-base cursor-pointer select-none ${
-                orbState === 'IDLE' && !isMicRecording
-                  ? 'mandi-orb-idle'
-                  : orbState === 'LISTENING' || isMicRecording
-                  ? 'mandi-orb-listening'
-                  : orbState === 'THINKING'
-                  ? 'mandi-orb-thinking'
-                  : orbState === 'SPEAKING'
-                  ? 'mandi-orb-speaking'
-                  : 'mandi-orb-error'
-              }`}
-              style={{
-                transform: `scale(${orbScale})`,
-                boxShadow: `inset -8px -8px 30px rgba(6, 182, 212, ${cyanAlpha}), inset 8px 8px 30px rgba(236, 72, 153, 0.35), 0 0 ${glowSpread}px rgba(124, 58, 237, ${0.4 + audioEnergy * 0.4}), 0 0 ${glowSpread + 30}px rgba(6, 182, 212, ${cyanAlpha})`
-              }}
-              title={
-                isMicRecording ? "Click orb to finish turn" :
-                orbState === 'SPEAKING' ? "Click orb to interrupt Mandi" :
-                "Click orb to speak"
-              }
-            >
-              {/* Inner Specular Highlight */}
-              <div className="absolute top-4 left-6 w-20 h-10 rounded-full bg-gradient-to-b from-white/20 to-transparent blur-[2px] pointer-events-none -rotate-45" />
-
-              {/* TWO VERTICAL WHITE CAPSULE-SHAPED EYES */}
-              <div 
-                className="flex items-center gap-7 z-10 transition-transform duration-100"
-                style={{
-                  transform: `translateY(${orbState === 'SPEAKING' ? eyeBounceY : 0}px)`
-                }}
-              >
-                {/* Left Eye */}
-                <div 
-                  className={`orb-eye eye-blink ${
-                    orbState === 'IDLE' && !isMicRecording
-                      ? 'eye-idle'
-                      : orbState === 'LISTENING' || isMicRecording
-                      ? 'eye-listening'
-                      : orbState === 'THINKING'
-                      ? 'eye-thinking'
-                      : orbState === 'SPEAKING'
-                      ? 'eye-speaking'
-                      : 'eye-error'
-                  }`}
-                  style={{
-                    transform: `scaleY(${eyeScaleY})`
-                  }}
-                />
+            {/* Top Info: Uselessness Meter */}
+            <div className="w-full relative z-10">
+              <div className="w-full px-4 py-2.5 rounded-2xl glass-pill flex items-center justify-between shadow-md">
+                <div className="flex items-center gap-2">
+                  <Gauge className="w-4 h-4 text-rose-400 animate-pulse" />
+                  <span className="text-zinc-400 font-mono uppercase tracking-wider text-[10px]">Uselessness:</span>
+                  <span className="font-bold text-rose-400 font-mono">{uselessness}%</span>
+                </div>
                 
-                {/* Right Eye */}
-                <div 
-                  className={`orb-eye eye-blink ${
-                    orbState === 'IDLE' && !isMicRecording
-                      ? 'eye-idle'
-                      : orbState === 'LISTENING' || isMicRecording
-                      ? 'eye-listening'
-                      : orbState === 'THINKING'
-                      ? 'eye-thinking'
-                      : orbState === 'SPEAKING'
-                      ? 'eye-speaking'
-                      : 'eye-error eye-error-right'
-                  }`}
-                  style={{
-                    transform: `scaleY(${eyeScaleY})`
-                  }}
-                />
+                {/* Visual Meter Bar */}
+                <div className="flex-1 mx-3 h-2 bg-zinc-800/80 rounded-full overflow-hidden border border-white/5">
+                  <div 
+                    className="h-full bg-gradient-to-r from-purple-500 via-rose-500 to-amber-400 rounded-full transition-all duration-500"
+                    style={{ width: `${uselessness}%` }}
+                  />
+                </div>
+
+                <div className="text-[11px] font-semibold text-purple-300 truncate max-w-[110px]">
+                  {currentMood}
+                </div>
               </div>
 
-              {/* Dynamic Audio Wave Bars inside Orb */}
-              {(orbState === 'SPEAKING' || isMicRecording) && (
-                <div className="absolute bottom-6 flex items-end gap-1.5 h-6">
-                  <span 
-                    className="w-1 bg-cyan-300/90 rounded-full transition-all duration-75"
-                    style={{ height: `${8 + Math.round(audioEnergy * 16)}px` }}
-                  />
-                  <span 
-                    className="w-1 bg-white rounded-full transition-all duration-75"
-                    style={{ height: `${12 + Math.round(audioEnergy * 24)}px` }}
-                  />
-                  <span 
-                    className="w-1 bg-purple-300/90 rounded-full transition-all duration-75"
-                    style={{ height: `${10 + Math.round(audioEnergy * 18)}px` }}
-                  />
-                  <span 
-                    className="w-1 bg-cyan-300/90 rounded-full transition-all duration-75"
-                    style={{ height: `${6 + Math.round(audioEnergy * 14)}px` }}
-                  />
+              {/* Microphone Permission / Error Notice */}
+              {micError && (
+                <div className="mt-2 w-full px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-[11px]">{micError}</span>
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Status Text with Interrupt Indicator */}
-          <div className="mt-3 flex flex-col items-center">
-            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-900/70 border border-zinc-800 text-xs font-mono text-zinc-300">
-              <span className={`w-2 h-2 rounded-full ${
-                orbState === 'ERROR' ? 'bg-rose-500 animate-ping' :
-                isMicRecording || orbState === 'LISTENING' ? 'bg-cyan-400 animate-ping' :
-                orbState === 'THINKING' ? 'bg-purple-400 animate-spin' :
-                orbState === 'SPEAKING' ? 'bg-emerald-400 animate-bounce' : 'bg-zinc-500'
-              }`} />
-              <span>{statusText}</span>
+            {/* Middle Section: THE GLOWING MANDI ORB */}
+            <div className="relative my-auto flex flex-col items-center justify-center py-4">
+              
+              {/* Outer Cyan / Purple Ripples */}
+              <div 
+                className={`absolute w-64 h-64 sm:w-72 sm:h-72 rounded-full border border-cyan-400/30 transition-all duration-300 pointer-events-none ${
+                  orbState === 'LISTENING' || isMicRecording
+                    ? 'scale-125 opacity-80 animate-ping'
+                    : orbState === 'SPEAKING'
+                    ? 'scale-110 opacity-60'
+                    : 'scale-95 opacity-0'
+                }`}
+              />
+              
+              {/* Ambient Backing Halo with dynamic energy glow */}
+              <div 
+                className="absolute w-56 h-56 sm:w-64 sm:h-64 rounded-full blur-2xl transition-all duration-300 pointer-events-none"
+                style={{
+                  backgroundColor: orbState === 'ERROR' ? 'rgba(225, 29, 72, 0.4)' :
+                                   orbState === 'LISTENING' || isMicRecording ? `rgba(6, 182, 212, ${cyanAlpha})` :
+                                   orbState === 'THINKING' ? 'rgba(219, 39, 119, 0.35)' :
+                                   `rgba(147, 51, 234, ${0.3 + audioEnergy * 0.4})`
+                }}
+              />
+
+              {/* Core Spherical Orb with Real-Time Audio Reactive Scale & Dynamic Shadow */}
+              <div 
+                onClick={handleInteractionToggle}
+                className={`mandi-orb-base cursor-pointer select-none ${
+                  orbState === 'IDLE' && !isMicRecording
+                    ? 'mandi-orb-idle'
+                    : orbState === 'LISTENING' || isMicRecording
+                    ? 'mandi-orb-listening'
+                    : orbState === 'THINKING'
+                    ? 'mandi-orb-thinking'
+                    : orbState === 'SPEAKING'
+                    ? 'mandi-orb-speaking'
+                    : 'mandi-orb-error'
+                }`}
+                style={{
+                  transform: `scale(${orbScale})`,
+                  boxShadow: `inset -8px -8px 30px rgba(6, 182, 212, ${cyanAlpha}), inset 8px 8px 30px rgba(236, 72, 153, 0.35), 0 0 ${glowSpread}px rgba(124, 58, 237, ${0.4 + audioEnergy * 0.4}), 0 0 ${glowSpread + 30}px rgba(6, 182, 212, ${cyanAlpha})`
+                }}
+                title={
+                  isMicRecording ? "Click orb to finish turn" :
+                  orbState === 'SPEAKING' ? "Click orb to interrupt Mandi" :
+                  "Click orb to speak"
+                }
+              >
+                {/* Inner Specular Highlight */}
+                <div className="absolute top-4 left-6 w-20 h-10 rounded-full bg-gradient-to-b from-white/20 to-transparent blur-[2px] pointer-events-none -rotate-45" />
+
+                {/* TWO VERTICAL WHITE CAPSULE-SHAPED EYES */}
+                <div 
+                  className="flex items-center gap-7 z-10 transition-transform duration-100"
+                  style={{
+                    transform: `translateY(${orbState === 'SPEAKING' ? eyeBounceY : 0}px)`
+                  }}
+                >
+                  {/* Left Eye */}
+                  <div 
+                    className={`orb-eye eye-blink ${
+                      orbState === 'IDLE' && !isMicRecording
+                        ? 'eye-idle'
+                        : orbState === 'LISTENING' || isMicRecording
+                        ? 'eye-listening'
+                        : orbState === 'THINKING'
+                        ? 'eye-thinking'
+                        : orbState === 'SPEAKING'
+                        ? 'eye-speaking'
+                        : 'eye-error'
+                    }`}
+                    style={{
+                      transform: `scaleY(${eyeScaleY})`
+                    }}
+                  />
+                  
+                  {/* Right Eye */}
+                  <div 
+                    className={`orb-eye eye-blink ${
+                      orbState === 'IDLE' && !isMicRecording
+                        ? 'eye-idle'
+                        : orbState === 'LISTENING' || isMicRecording
+                        ? 'eye-listening'
+                        : orbState === 'THINKING'
+                        ? 'eye-thinking'
+                        : orbState === 'SPEAKING'
+                        ? 'eye-speaking'
+                        : 'eye-error eye-error-right'
+                    }`}
+                    style={{
+                      transform: `scaleY(${eyeScaleY})`
+                    }}
+                  />
+                </div>
+
+                {/* Dynamic Audio Wave Bars inside Orb */}
+                {(orbState === 'SPEAKING' || isMicRecording) && (
+                  <div className="absolute bottom-6 flex items-end gap-1.5 h-6">
+                    <span 
+                      className="w-1 bg-cyan-300/90 rounded-full transition-all duration-75"
+                      style={{ height: `${8 + Math.round(audioEnergy * 16)}px` }}
+                    />
+                    <span 
+                      className="w-1 bg-white rounded-full transition-all duration-75"
+                      style={{ height: `${12 + Math.round(audioEnergy * 24)}px` }}
+                    />
+                    <span 
+                      className="w-1 bg-purple-300/90 rounded-full transition-all duration-75"
+                      style={{ height: `${10 + Math.round(audioEnergy * 18)}px` }}
+                    />
+                    <span 
+                      className="w-1 bg-cyan-300/90 rounded-full transition-all duration-75"
+                      style={{ height: `${6 + Math.round(audioEnergy * 14)}px` }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Status Pill */}
+              <div className="mt-4 flex flex-col items-center">
+                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-mono text-zinc-300 shadow-sm">
+                  <span className={`w-2 h-2 rounded-full ${
+                    orbState === 'ERROR' ? 'bg-rose-500 animate-ping' :
+                    isMicRecording || orbState === 'LISTENING' ? 'bg-cyan-400 animate-ping' :
+                    orbState === 'THINKING' ? 'bg-purple-400 animate-spin' :
+                    orbState === 'SPEAKING' ? 'bg-emerald-400 animate-bounce' : 'bg-zinc-500'
+                  }`} />
+                  <span>{statusText}</span>
+                </div>
+
+                {/* Live Speech Recognition Feedback */}
+                {isMicRecording && (
+                  <div className="mt-2.5 px-4 py-1.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 text-xs flex items-center gap-2 max-w-sm text-center animate-pulse shadow-lg shadow-cyan-950/50">
+                    <Mic className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                    <span className="font-sans font-medium truncate">
+                      {liveSpeechTranscript ? `"${liveSpeechTranscript}"` : "Listening to voice... speak now"}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Live Speech Recognition Feedback */}
-            {isMicRecording && (
-              <div className="mt-2.5 px-4 py-1.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 text-xs flex items-center gap-2 max-w-md text-center animate-pulse shadow-lg shadow-cyan-950/50">
-                <Mic className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                <span className="font-sans font-medium">
-                  {liveSpeechTranscript ? `"${liveSpeechTranscript}"` : "Listening to your voice... speak now"}
-                </span>
+            {/* Bottom Controls: Microphone Action & Character Buttons */}
+            <div className="w-full flex flex-col items-center gap-3 relative z-10">
+              
+              {/* Mic / Interrupt Button */}
+              <div className="flex items-center justify-center">
+                <button
+                  onClick={handleInteractionToggle}
+                  className={`relative group flex items-center justify-center h-14 w-14 rounded-full transition-all duration-300 shadow-xl ${
+                    isMicRecording
+                      ? 'bg-cyan-500 text-black shadow-cyan-500/50 scale-110 ring-4 ring-cyan-400/40 animate-pulse'
+                      : orbState === 'SPEAKING'
+                      ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/40'
+                      : 'bg-gradient-to-tr from-purple-600 via-rose-600 to-cyan-500 text-white hover:scale-105 shadow-purple-600/30'
+                  }`}
+                >
+                  {isMicRecording ? (
+                    <MicOff className="w-6 h-6" />
+                  ) : orbState === 'SPEAKING' ? (
+                    <Square className="w-5 h-5 fill-current" />
+                  ) : (
+                    <Mic className="w-6 h-6" />
+                  )}
+                </button>
               </div>
-            )}
-          </div>
 
-          {/* Language Switcher Bar */}
-          <div className="mt-4 flex items-center justify-center gap-1.5 p-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 text-xs shadow-md">
-            <span className="px-2 text-zinc-400 font-medium flex items-center gap-1 text-[11px]">
-              <Globe className="w-3.5 h-3.5 text-cyan-400" /> Speech:
-            </span>
-            <button
-              onClick={() => setSpeechLang('ml-IN')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                speechLang === 'ml-IN'
-                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              🌴 Malayalam (ml-IN)
-            </button>
-            <button
-              onClick={() => setSpeechLang('en-IN')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                speechLang === 'en-IN'
-                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              🔤 Manglish
-            </button>
-            <button
-              onClick={() => setSpeechLang('hi-IN')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                speechLang === 'hi-IN'
-                  ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              🇮🇳 Hindi
-            </button>
-          </div>
+              {/* Language Switcher Bar */}
+              <div className="flex items-center justify-center gap-1.5 p-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 text-xs shadow-md">
+                <span className="px-2 text-zinc-400 font-medium flex items-center gap-1 text-[11px]">
+                  <Globe className="w-3.5 h-3.5 text-cyan-400" /> Speech:
+                </span>
+                <button
+                  onClick={() => setSpeechLang('ml-IN')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                    speechLang === 'ml-IN'
+                      ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
+                      : 'text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  🌴 Malayalam (ml-IN)
+                </button>
+                <button
+                  onClick={() => setSpeechLang('en-IN')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                    speechLang === 'en-IN'
+                      ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
+                      : 'text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  🔤 Manglish
+                </button>
+                <button
+                  onClick={() => setSpeechLang('hi-IN')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                    speechLang === 'hi-IN'
+                      ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md shadow-cyan-500/20'
+                      : 'text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  🇮🇳 Hindi
+                </button>
+              </div>
 
-          {/* Microphone Action Button */}
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <button
-              onClick={handleInteractionToggle}
-              className={`relative group flex items-center justify-center h-16 w-16 rounded-full transition-all duration-300 shadow-xl ${
-                isMicRecording
-                  ? 'bg-cyan-500 text-black shadow-cyan-500/50 scale-110 ring-4 ring-cyan-400/40 animate-pulse'
-                  : orbState === 'SPEAKING'
-                  ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/40'
-                  : 'bg-gradient-to-tr from-purple-600 via-rose-600 to-cyan-500 text-white hover:scale-105 shadow-purple-600/30'
-              }`}
-            >
-              {isMicRecording ? (
-                <MicOff className="w-7 h-7" />
-              ) : orbState === 'SPEAKING' ? (
-                <Square className="w-6 h-6 fill-current" />
-              ) : (
-                <Mic className="w-7 h-7" />
-              )}
-            </button>
-          </div>
-          <p className="mt-2 text-[11px] text-zinc-500 font-mono">
-            {isMicRecording ? 'Listening: tap to finish turn' :
-             orbState === 'SPEAKING' ? 'Tap button or orb to interrupt Mandi' :
-             'Tap orb or mic to start speaking'}
-          </p>
+              <p className="text-[11px] text-zinc-500 font-mono">
+                {isMicRecording ? 'Listening: tap to finish turn' :
+                 orbState === 'SPEAKING' ? 'Tap button or orb to interrupt Mandi' :
+                 'Tap orb or mic to start speaking'}
+              </p>
 
-          {/* CHARACTER-DRIVEN ACTION BUTTONS: "ARE YOU SURE?", "WHY?", "RANDOM ADVICE" */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-            <button
-              onClick={triggerAreYouSure}
-              disabled={orbState === 'THINKING'}
-              className="px-3.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span>Are you sure?</span>
-            </button>
+              {/* Character-Driven Mode Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                <button
+                  onClick={triggerAreYouSure}
+                  disabled={orbState === 'THINKING'}
+                  className="px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
+                >
+                  <HelpCircle className="w-3 h-3" />
+                  <span>Are you sure?</span>
+                </button>
 
-            <button
-              onClick={triggerWhy}
-              disabled={orbState === 'THINKING'}
-              className="px-3.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
-            >
-              <QuestionIcon className="w-3.5 h-3.5" />
-              <span>Why? {whyCount > 0 && `(${whyCount})`}</span>
-            </button>
+                <button
+                  onClick={triggerWhy}
+                  disabled={orbState === 'THINKING'}
+                  className="px-3 py-1 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
+                >
+                  <QuestionIcon className="w-3 h-3" />
+                  <span>Why? {whyCount > 0 && `(${whyCount})`}</span>
+                </button>
 
-            <button
-              onClick={triggerRandomAdvice}
-              disabled={orbState === 'THINKING'}
-              className="px-3.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Random Useless Advice</span>
-            </button>
+                <button
+                  onClick={triggerRandomAdvice}
+                  disabled={orbState === 'THINKING'}
+                  className="px-3 py-1 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>Random Advice</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </section>
 
-        {/* BOTTOM SECTION: CONVERSATION HISTORY & TEXT INPUT */}
-        <section className="w-full max-w-3xl mt-4 flex flex-col gap-3">
-          
-          {/* Quick Starter Chips */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {QUICK_PROMPTS.map((item, idx) => {
-              const IconComp = item.icon;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleSendPrompt(item.prompt, item.mode)}
-                  disabled={orbState === 'THINKING'}
-                  className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800 text-zinc-300 text-xs transition active:scale-95 disabled:opacity-40"
-                >
-                  <IconComp className="w-3.5 h-3.5 text-purple-400" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
+        {/* ================= RIGHT COLUMN: CHAT STREAM & INPUT ================= */}
+        <section className="lg:col-span-7 h-full min-h-0 flex flex-col">
+          <div className="glass-card rounded-3xl p-4 sm:p-5 flex flex-col h-full relative overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl">
+            
+            {/* Top decorative glow */}
+            <div className="absolute -top-24 right-10 w-64 h-24 bg-cyan-600/15 blur-3xl pointer-events-none rounded-full" />
 
-          {/* Chat Message Drawer (Collapsible feed) */}
-          <div className="glass-panel rounded-2xl p-4 max-h-48 sm:max-h-56 overflow-y-auto space-y-3">
-            {messages.map((m) => (
-              <div
-                key={m.id}
-                className={`flex gap-3 text-xs leading-relaxed ${
-                  m.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+            {/* Chat Header Bar */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <h2 className="text-sm font-bold tracking-wide text-zinc-200">
+                  Conversation Stream
+                </h2>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/10 text-zinc-400 font-mono">
+                  {messages.length} messages
+                </span>
+              </div>
+
+              {/* Clear Chat Action */}
+              <button
+                onClick={() => {
+                  cancelAllSpeech();
+                  setMessages([
+                    {
+                      id: Date.now(),
+                      sender: 'mandi',
+                      text: "Chat cleared! Enthu venam bro? Ask anything or tap the mic.",
+                      time: 'Now'
+                    }
+                  ]);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl glass-pill hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-300 text-zinc-400 text-xs transition"
+                title="Clear conversation"
               >
-                {m.sender === 'mandi' && (
-                  <div className="h-6 w-6 rounded-lg bg-purple-600/30 border border-purple-500/40 flex items-center justify-center flex-shrink-0 text-[11px]">
-                    🤡
-                  </div>
-                )}
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="text-[11px]">Clear</span>
+              </button>
+            </div>
+
+            {/* Quick Starter Chips */}
+            <div className="flex items-center gap-2 overflow-x-auto py-2.5 flex-shrink-0 no-scrollbar">
+              {QUICK_PROMPTS.map((item, idx) => {
+                const IconComp = item.icon;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleSendPrompt(item.prompt, item.mode)}
+                    disabled={orbState === 'THINKING'}
+                    className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-pill hover:bg-white/[0.08] text-zinc-300 text-xs transition active:scale-95 disabled:opacity-40"
+                  >
+                    <IconComp className="w-3.5 h-3.5 text-purple-400" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Scrollable Message Feed */}
+            <div className="flex-1 overflow-y-auto space-y-3.5 pr-1.5 my-2 custom-scrollbar min-h-0">
+              {messages.map((m) => (
                 <div
-                  className={`px-3.5 py-2 rounded-2xl max-w-[85%] sm:max-w-[75%] ${
-                    m.sender === 'user'
-                      ? 'bg-gradient-to-r from-purple-600 to-rose-600 text-white rounded-tr-none'
-                      : 'bg-zinc-900/90 text-zinc-200 border border-zinc-800 rounded-tl-none'
+                  key={m.id}
+                  className={`flex gap-3 text-xs leading-relaxed ${
+                    m.sender === 'user' ? 'justify-end' : 'justify-start'
                   }`}
                 >
-                  <p>{m.text}</p>
-                  {m.meme && (
-                    <span className="inline-block mt-1 text-[10px] text-amber-300/80 font-mono">
-                      ✨ {m.meme}
-                    </span>
+                  {m.sender === 'mandi' && (
+                    <div className="h-7 w-7 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0 text-sm shadow-md mt-0.5">
+                      🤡
+                    </div>
                   )}
-                  <div className="mt-1 flex items-center justify-end gap-1.5 text-[9px] text-zinc-400 opacity-60">
-                    <span>{m.time}</span>
+                  <div
+                    className={`px-4 py-3 rounded-2xl max-w-[85%] sm:max-w-[78%] transition-all ${
+                      m.sender === 'user'
+                        ? 'bg-gradient-to-r from-purple-600/90 via-purple-700/90 to-rose-600/90 border border-white/10 text-white rounded-tr-none shadow-lg shadow-purple-950/20'
+                        : 'bg-white/[0.04] text-zinc-100 border border-white/[0.08] backdrop-blur-md rounded-tl-none shadow-lg'
+                    }`}
+                  >
+                    <p className="text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap">{m.text}</p>
+                    {m.meme && (
+                      <span className="inline-block mt-1.5 text-[10px] text-amber-300/90 font-mono bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                        ✨ {m.meme}
+                      </span>
+                    )}
+                    <div className="mt-1.5 flex items-center justify-end gap-1.5 text-[9px] text-zinc-400 opacity-60">
+                      <span>{m.time}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            <div ref={chatEndRef} />
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Text Input Prompt Bar */}
+            <div className="pt-2 border-t border-white/[0.08] flex-shrink-0">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendPrompt(inputVal, 'normal');
+                }}
+                className="relative flex items-center gap-2"
+              >
+                <input
+                  type="text"
+                  value={inputVal}
+                  onChange={(e) => setInputVal(e.target.value)}
+                  placeholder="Ask Mandi anything in Hindi, Malayalam, or English..."
+                  className="flex-1 bg-white/[0.04] border border-white/10 focus:border-purple-400/60 focus:bg-white/[0.07] rounded-2xl px-4 py-3 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-purple-400/40 transition backdrop-blur-md shadow-inner"
+                />
+                <button
+                  type="submit"
+                  disabled={!inputVal.trim() || orbState === 'THINKING'}
+                  className="h-11 px-5 rounded-2xl bg-gradient-to-r from-purple-600 via-rose-600 to-pink-600 hover:from-purple-500 hover:to-rose-500 disabled:opacity-40 disabled:hover:from-purple-600 disabled:hover:to-rose-600 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg shadow-purple-600/25 flex-shrink-0"
+                >
+                  <span>Send</span>
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </form>
+              <p className="mt-1.5 text-center text-[10px] text-zinc-500">
+                Enter to send • Click microphone on the left to speak in voice mode
+              </p>
+            </div>
+
           </div>
-
-          {/* Text Input Prompt Bar */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSendPrompt(inputVal, 'normal');
-            }}
-            className="relative flex items-center gap-2"
-          >
-            <input
-              type="text"
-              value={inputVal}
-              onChange={(e) => setInputVal(e.target.value)}
-              placeholder="Ask Mandi anything in Hindi, Malayalam, or English..."
-              className="flex-1 bg-zinc-900/90 border border-zinc-800 focus:border-purple-500 rounded-2xl px-4 py-3 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition backdrop-blur-md shadow-inner"
-            />
-            <button
-              type="submit"
-              disabled={!inputVal.trim() || orbState === 'THINKING'}
-              className="h-11 px-5 rounded-2xl bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 disabled:opacity-40 disabled:hover:from-purple-600 disabled:hover:to-rose-600 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg shadow-purple-600/20"
-            >
-              <span>Send</span>
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          </form>
-
         </section>
 
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-3 text-center text-[11px] text-zinc-600 border-t border-zinc-900/60 bg-[#070709]/60 backdrop-blur-md">
-        Mandi • The Useless AI Voice Friend • TinkerHub Useless Projects 2026
+      {/* Minimal Footer */}
+      <footer className="relative z-10 py-1.5 px-6 text-center text-[10px] text-zinc-500 border-t border-white/[0.06] bg-[#070709]/40 backdrop-blur-md flex-shrink-0 flex items-center justify-between">
+        <span>Mandi v2.0 • The Chaotic AI Voice Friend</span>
+        <span className="hidden sm:inline">TinkerHub Useless Projects 2026 • Powered by Gemini & Sarvam AI</span>
       </footer>
 
     </div>
