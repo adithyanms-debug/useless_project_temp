@@ -50,14 +50,32 @@ const QUICK_PROMPTS = [
 ];
 
 export default function App() {
-  const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-  const defaultBackend = isProduction ? window.location.origin : 'http://localhost:8000';
-  const defaultWs = isProduction
-    ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/voice`
-    : 'ws://localhost:8000/ws/voice';
+  const getBackendUrl = () => {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL;
+    if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+      const h = window.location.hostname;
+      if (h !== 'localhost' && h !== '127.0.0.1') {
+        return window.location.origin;
+      }
+    }
+    return 'http://localhost:8000';
+  };
 
-  const backendUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || defaultBackend;
-  const wsUrl = import.meta.env.VITE_WS_URL || defaultWs;
+  const getWsUrl = () => {
+    if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL;
+    if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+      const h = window.location.hostname;
+      if (h !== 'localhost' && h !== '127.0.0.1') {
+        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        return `${proto}//${window.location.host}/ws/voice`;
+      }
+    }
+    return 'ws://localhost:8000/ws/voice';
+  };
+
+  const backendUrl = getBackendUrl();
+  const wsUrl = getWsUrl();
 
   // Orb UI State: 'IDLE' | 'LISTENING' | 'THINKING' | 'SPEAKING' | 'ERROR'
   const [orbState, setOrbState] = useState('IDLE');
