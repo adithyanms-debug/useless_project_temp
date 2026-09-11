@@ -50,8 +50,14 @@ const QUICK_PROMPTS = [
 ];
 
 export default function App() {
-  const backendUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/voice';
+  const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+  const defaultBackend = isProduction ? window.location.origin : 'http://localhost:8000';
+  const defaultWs = isProduction
+    ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/voice`
+    : 'ws://localhost:8000/ws/voice';
+
+  const backendUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || defaultBackend;
+  const wsUrl = import.meta.env.VITE_WS_URL || defaultWs;
 
   // Orb UI State: 'IDLE' | 'LISTENING' | 'THINKING' | 'SPEAKING' | 'ERROR'
   const [orbState, setOrbState] = useState('IDLE');
