@@ -15,8 +15,8 @@ class SarvamTTSService:
         self.api_key = settings.SARVAM_API_KEY
         self.endpoint = "https://api.sarvam.ai/text-to-speech"
         self.model = "bulbul:v3"
-        # Malayalam female voice for MANDI
-        self.default_speaker = "anuja"
+        # Malayalam speaker for MANDI (bulbul:v3 voice)
+        self.default_speaker = "kavya"
         self.default_lang = "ml-IN"
 
     async def generate_speech(
@@ -98,16 +98,16 @@ class SarvamTTSService:
             return "ml-IN"
 
     def _pick_speaker(self, lang: str) -> str:
-        """Pick a speaker appropriate for the language."""
+        """Pick a valid speaker for Sarvam bulbul:v3 model."""
         speakers = {
-            "ml-IN": "anuja",     # Malayalam female
-            "hi-IN": "meera",     # Hindi female
-            "en-IN": "meera",     # English with Indian accent
-            "ta-IN": "anuja",     # Tamil
-            "te-IN": "anuja",     # Telugu
-            "kn-IN": "anuja",     # Kannada
+            "ml-IN": "kavya",     # Malayalam female (or 'gokul' for male)
+            "hi-IN": "shreya",    # Hindi female
+            "en-IN": "kavya",     # English with Indian accent
+            "ta-IN": "kavitha",   # Tamil female
+            "te-IN": "kavya",     # Telugu female
+            "kn-IN": "kavya",     # Kannada female
         }
-        return speakers.get(lang, "anuja")
+        return speakers.get(lang, "kavya")
 
 
 sarvam_tts = SarvamTTSService()

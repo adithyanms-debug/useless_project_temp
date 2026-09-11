@@ -22,8 +22,9 @@ async def chat_endpoint(request: ChatRequest):
             why_count=request.why_count
         )
 
-        # Generate natural voice audio via Sarvam Bulbul TTS
-        audio_b64 = await sarvam_tts.generate_speech_base64(response_data["reply_text"])
+        # Generate natural voice audio via Sarvam Bulbul TTS (prefer native Malayalam script tts_text for authentic accent)
+        tts_input = response_data.get("tts_text") or response_data["reply_text"]
+        audio_b64 = await sarvam_tts.generate_speech_base64(tts_input)
         if audio_b64:
             response_data["audio_base64"] = audio_b64
 
@@ -75,8 +76,9 @@ async def voice_websocket(websocket: WebSocket):
                     why_count=why_count
                 )
 
-                # Generate Sarvam TTS audio
-                audio_b64 = await sarvam_tts.generate_speech_base64(mandi_res["reply_text"])
+                # Generate Sarvam TTS audio (prefer native Malayalam script tts_text for authentic accent)
+                tts_input = mandi_res.get("tts_text") or mandi_res["reply_text"]
+                audio_b64 = await sarvam_tts.generate_speech_base64(tts_input)
                 if audio_b64:
                     mandi_res["audio_base64"] = audio_b64
 

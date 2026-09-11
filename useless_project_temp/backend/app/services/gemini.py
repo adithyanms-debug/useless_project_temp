@@ -40,7 +40,8 @@ MOODS (Pick the most fitting one for each response):
 
 Return your output strictly as a JSON object with the following keys:
 {
-  "reply_text": "<your sarcastic spoken reply in mixed Hindi/Malayalam/English>",
+  "reply_text": "<your sarcastic spoken reply in Manglish / mixed Hindi/Malayalam/English for the chat UI>",
+  "tts_text": "<the exact same reply translated into native Malayalam Unicode script (മലയാളം അക്ഷരങ്ങൾ) for Sarvam TTS so the voice sounds 100% natural with a fluent native Malayalam accent>",
   "uselessness_pct": <number between 40 and 100 representing uselessness level>,
   "mood": "<one of the exact mood strings listed above>",
   "meme_reference": "<optional short meme tag or reference phrase or null>"
@@ -114,21 +115,43 @@ class GeminiService:
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=self.api_key)
-                try:
-                    # Try modern google-generativeai (>= 0.5.0)
-                    self.model = genai.GenerativeModel(
-                        model_name="gemini-1.5-flash",
-                        system_instruction=MANDI_SYSTEM_PROMPT
-                    )
-                    self.uses_system_instruction = True
-                except TypeError:
-                    # Fallback for older google-generativeai (< 0.5.0)
-                    self.model = genai.GenerativeModel(
-                        model_name="gemini-1.5-flash"
-                    )
-                    self.uses_system_instruction = False
-                self.client = genai
-                logger.info("Gemini API initialized successfully with gemini-1.5-flash.")
+                
+                # Model candidates in order of preference
+                model_candidates = [
+                    "models/gemini-2.5-flash",
+                    "gemini-2.5-flash",
+                    "models/gemini-1.5-flash",
+                    "gemini-flash-latest",
+                    "gemini-pro-latest"
+                ]
+                
+                self.model = None
+                for m_name in model_candidates:
+                    try:
+                        self.model = genai.GenerativeModel(
+                            model_name=m_name,
+                            system_instruction=MANDI_SYSTEM_PROMPT
+                        )
+                        self.uses_system_instruction = True
+                        logger.info(f"Gemini API initialized successfully with model: {m_name}")
+                        break
+                    except TypeError:
+                        # Fallback for older google-generativeai (< 0.5.0) without system_instruction
+                        try:
+                            self.model = genai.GenerativeModel(model_name=m_name)
+                            self.uses_system_instruction = False
+                            logger.info(f"Gemini API initialized successfully with model: {m_name} (legacy)")
+                            break
+                        except Exception:
+                            continue
+                    except Exception:
+                        continue
+
+                if self.model:
+                    self.client = genai
+                else:
+                    logger.warning("Could not initialize any Gemini model candidate. Falling back to dynamic Mandi engine.")
+                    self.client = None
             except Exception as e:
                 logger.warning(f"Could not initialize Gemini API: {e}. Falling back to dynamic Mandi engine.")
                 self.client = None
@@ -175,19 +198,34 @@ class GeminiService:
         if self.client:
             try:
                 if self.uses_system_instruction:
-                    prompt = f"User message: {message}\nMode: {mode}"
+                    prompt = f"User message: {message}\nMode: {mode}\nOutput JSON only."
                 else:
                     # Prepend system instruction for google-generativeai < 0.5.0
-                    prompt = f"{MANDI_SYSTEM_PROMPT}\n\nUser message: {message}\nMode: {mode}"
+                    prompt = f"{MANDI_SYSTEM_PROMPT}\n\nUser message: {message}\nMode: {mode}\nOutput JSON only."
 
-                response = self.model.generate_content(
-                    prompt,
-                    generation_config={"response_mime_type": "application/json"}
-                )
+                try:
+                    response = self.model.generate_content(
+                        prompt,
+                        generation_config={"response_mime_type": "application/json"}
+                    )
+                except Exception:
+                    # Fallback for SDK versions without response_mime_type support
+                    response = self.model.generate_content(prompt)
+
                 if response and response.text:
-                    parsed = json.loads(response.text)
+                    raw_text = response.text.strip()
+                    if raw_text.startswith("```"):
+                        lines = raw_text.splitlines()
+                        if lines[0].startswith("```"):
+                            lines = lines[1:]
+                        if lines and lines[-1].startswith("```"):
+                            lines = lines[:-1]
+                        raw_text = "\n".join(lines).strip()
+
+                    parsed = json.loads(raw_text)
                     return {
                         "reply_text": parsed.get("reply_text", "Bro, tension edukkalle yaar."),
+                        "tts_text": parsed.get("tts_text") or parsed.get("reply_text"),
                         "uselessness_pct": int(parsed.get("uselessness_pct", random.randint(70, 98))),
                         "mood": parsed.get("mood", "Overconfident 😎"),
                         "meme_reference": parsed.get("meme_reference", None)
@@ -205,6 +243,7 @@ class GeminiService:
         if "text" in msg_lower or "crush" in msg_lower or "she" in msg_lower or "he" in msg_lower or "girl" in msg_lower or "boy" in msg_lower or "reply" in msg_lower or mode == "relationship":
             return {
                 "reply_text": f"Arre bro, asking about '{msg_clean}'? Life-il risk venam yaar! Text cheyyeda, but single tick mathram vannal njan responsibility edukilla.",
+                "tts_text": f"ടെക്സ്റ്റ് ചെയ്യെടാ ബ്രോ! ലൈഫിൽ റിസ്ക് വേണം യാർ. സിംഗിൾ ടിക് വന്നാൽ ഞാൻ റെസ്പോൺസിബിലിറ്റി എടുക്കില്ല.",
                 "uselessness_pct": random.randint(78, 92),
                 "mood": "Overconfident 😎",
                 "meme_reference": "Risk Hai Toh Ishq Hai"
@@ -213,6 +252,7 @@ class GeminiService:
         if "exam" in msg_lower or "study" in msg_lower or "fail" in msg_lower or "marks" in msg_lower:
             return {
                 "reply_text": f"Regarding '{msg_clean}'... Exam poyi bro, but life poyilla! Relax, tension edukkalle.",
+                "tts_text": f"എക്സാം പോയി ബ്രോ, ബട്ട് ലൈഫ് പോയില്ല! റിലാക്സ് ടെൻഷൻ എടുക്കല്ലേ.",
                 "uselessness_pct": random.randint(80, 95),
                 "mood": "Chaotic 🔥",
                 "meme_reference": "Exam Trauma"
@@ -221,6 +261,7 @@ class GeminiService:
         if "tired" in msg_lower or "sleep" in msg_lower or "headache" in msg_lower:
             return {
                 "reply_text": f"Bro you asked '{msg_clean}'. If you're tired, sleep da! Wow, revolutionary discovery aanu! That will be ₹499 consultation fee.",
+                "tts_text": f"ബ്രോ ക്ഷീണം ഉണ്ടെങ്കിൽ ഉറങ്ങെടാ! റവല്യൂഷനറി ഡിസ്കവറി ആണ്. 499 രൂപ കൺസൾട്ടേഷൻ ഫീ തരൂ.",
                 "uselessness_pct": 98,
                 "mood": "Peak Uselessness 🤡",
                 "meme_reference": "Consultation Fee ₹499"
@@ -229,21 +270,22 @@ class GeminiService:
         if "eat" in msg_lower or "food" in msg_lower or "hungry" in msg_lower:
             return {
                 "reply_text": f"Thinking about '{msg_clean}'? Biryani kazhikkeda bro! Swantham stomach-ine happy aakkan poyillel pinne enthonnu life?",
+                "tts_text": f"ബിരിയാണി കഴിക്ക് ബ്രോ! സ്വന്തം വയറിനെ ഹാപ്പി ആക്കാൻ പറ്റിയില്ലെങ്കിൽ പിന്നെ എന്തൊന്ന് ലൈഫ്?",
                 "uselessness_pct": 75,
                 "mood": "Hungry 🥭",
                 "meme_reference": "Biryani Solution"
             }
 
         # Dynamic template inserting user question
-        templates = [
-            f"Arre da, regarding '{msg_clean}' — full confidence ayt parayam, 100% zero logic solution aanu my specialty!",
-            f"You asked: '{msg_clean}'? Bro, simple concept aanu, but njan describe cheyyan poyal brain overload aakum!",
+        reply_choice = random.choice([
+            f"Arre da, regarding '{msg_clean}' — full confidence ayt parayam, zero logic solution aanu my specialty!",
             f"Enthonnu bro ithu? '{msg_clean}' pathiyokke aalochikkanullatha, tension edukkathe chaye kudi!",
             f"Bilkul top question da: '{msg_clean}'. Answer enikku aariyilla, but confidence look cheyyu!"
-        ]
+        ])
 
         return {
-            "reply_text": random.choice(templates),
+            "reply_text": reply_choice,
+            "tts_text": f"എന്തൊന്ന് ബ്രോ ഇത്? ടെൻഷൻ എടുക്കാതെ ചായ കുടി!",
             "uselessness_pct": random.randint(82, 99),
             "mood": random.choice(["Overconfident 😎", "Peak Uselessness 🤡", "Confused 😵", "Chaotic 🔥"]),
             "meme_reference": "Dynamic User Response"
