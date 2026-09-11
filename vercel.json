@@ -9,18 +9,18 @@
       }
     },
     {
-      "src": "useless_project_temp/backend/app/main.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "useless_project_temp/backend/app/main.py"
+      "dest": "api/index.py"
     },
     {
       "src": "/health",
-      "dest": "useless_project_temp/backend/app/main.py"
+      "dest": "api/index.py"
     },
     {
       "src": "/(.*)",
