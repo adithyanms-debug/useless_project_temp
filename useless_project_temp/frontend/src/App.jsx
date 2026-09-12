@@ -50,6 +50,17 @@ const QUICK_PROMPTS = [
 ];
 
 export default function App() {
+  // Detect serverless deployment (Vercel, etc.) where WebSockets are not supported
+  const isServerless = () => {
+    if (import.meta.env.VITE_WS_URL) return false; // Explicit WS URL means WS is available
+    if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+      const h = window.location.hostname;
+      // Non-localhost = likely serverless (Vercel). WebSockets won't work.
+      if (h !== 'localhost' && h !== '127.0.0.1') return true;
+    }
+    return false;
+  };
+
   const getBackendUrl = () => {
     if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
     if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL;
@@ -64,13 +75,8 @@ export default function App() {
 
   const getWsUrl = () => {
     if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL;
-    if (typeof window !== 'undefined' && window.location && window.location.hostname) {
-      const h = window.location.hostname;
-      if (h !== 'localhost' && h !== '127.0.0.1') {
-        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        return `${proto}//${window.location.host}/ws/voice`;
-      }
-    }
+    // Don't attempt WebSocket on serverless platforms
+    if (isServerless()) return null;
     return 'ws://localhost:8000/ws/voice';
   };
 
@@ -344,7 +350,15 @@ export default function App() {
   };
 
   // Connect WebSocket to Mandi2.0 Backend (/ws/voice) with controlled exponential backoff
+  // On serverless (Vercel), WebSocket is unavailable — skip connection and use HTTP fallback
   const connectWebSocket = () => {
+    // If no WebSocket URL (serverless), go straight to HTTP-only mode
+    if (!wsUrl) {
+      setWsStatus('http-only');
+      console.info('Serverless environment detected — using HTTP /api/chat fallback (WebSocket not available)');
+      return;
+    }
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
@@ -743,13 +757,15 @@ export default function App() {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl glass-pill text-xs">
               {wsStatus === 'connected' ? (
                 <Wifi className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              ) : wsStatus === 'http-only' ? (
+                <Activity className="w-3.5 h-3.5 text-emerald-400" />
               ) : wsStatus === 'reconnecting' ? (
                 <RefreshCw className="w-3.5 h-3.5 text-amber-400 animate-spin" />
               ) : (
                 <WifiOff className="w-3.5 h-3.5 text-rose-400" />
               )}
               <span className="capitalize text-zinc-300">
-                {wsStatus === 'connected' ? 'Live' : wsStatus === 'reconnecting' ? 'Retrying...' : 'Offline'}
+                {wsStatus === 'connected' ? 'Live' : wsStatus === 'http-only' ? 'HTTP Mode' : wsStatus === 'reconnecting' ? 'Retrying...' : 'Offline'}
               </span>
             </div>
 

@@ -104,11 +104,12 @@ class GeminiService:
         self.client = None
         # Models in order of reliability & speed (tries next if one hits 404, quota 429, or rate limit)
         self.candidate_models = [
-            "gemini-1.5-flash",
             "gemini-2.0-flash",
-            "gemini-1.5-pro",
+            "gemini-1.5-flash-8b",
             "gemini-2.0-flash-lite",
-            "gemini-flash-latest"
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+            "gemini-2.0-flash-exp"
         ]
         self._init_client()
 
