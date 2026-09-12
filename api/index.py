@@ -10,4 +10,4 @@ for path in [backend_dir, root_dir]:
     if path not in sys.path:
         sys.path.insert(0, path)
 
-from app.main import app
+from app.main import app  # type: ignore  # noqa: E402 — resolved via sys.path above
