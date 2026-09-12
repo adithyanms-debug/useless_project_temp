@@ -103,13 +103,13 @@ class GeminiService:
         self.api_key = settings.GEMINI_API_KEY
         self.client = None
         # Models in order of reliability & speed (tries next if one hits 404, quota 429, or rate limit)
+        # Updated Sep 2026: old gemini-1.5/2.0 models retired by Google
         self.candidate_models = [
-            "gemini-2.0-flash",
-            "gemini-1.5-flash-8b",
-            "gemini-2.0-flash-lite",
-            "gemini-1.5-flash",
-            "gemini-1.5-pro",
-            "gemini-2.0-flash-exp"
+            "gemini-3.5-flash-lite",
+            "gemini-3.5-flash",
+            "gemini-2.5-flash",
+            "gemini-3.6-flash",
+            "gemini-3.1-pro-preview",
         ]
         self._init_client()
 
